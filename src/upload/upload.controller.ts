@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFile,
   UploadedFiles,
+  Body,
 } from '@nestjs/common';
 import { UploadService } from './upload.service';
 import {
@@ -26,8 +27,9 @@ export class UploadController {
   // 單一檔案上傳
   @Post('/singleFile')
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  uploadFile(@UploadedFile() file: Express.Multer.File, @Body() body) {
     console.log('file:', file);
+    console.log(body.address);
     return file;
   }
 
@@ -54,8 +56,16 @@ export class UploadController {
   //   不分欄位之多個檔案上傳
   @Post('/anyMultipleField')
   @UseInterceptors(AnyFilesInterceptor())
-  anyMultipleField(@UploadedFiles() files: Express.Multer.File[]) {
+  anyMultipleField(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() body: any,
+  ) {
+    console.log('body:', body);
+    console.log(body.name, body.address);
     console.log('files:', files);
-    return files;
+    return {
+      ...files,
+      ...body,
+    };
   }
 }
