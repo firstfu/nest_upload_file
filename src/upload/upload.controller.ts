@@ -1,29 +1,61 @@
+/**
+ * @ Author: firstfu
+ * @ Create Time: 2023-09-09 01:35:53
+ * @ Description: 檔案上傳
+ */
+
 import {
   Controller,
   Post,
-  Body,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { UploadService } from './upload.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  AnyFilesInterceptor,
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post('/file')
+  // 單一檔案上傳
+  @Post('/singleFile')
   @UseInterceptors(FileInterceptor('file'))
-  create(@UploadedFile() file, @Body() body: any) {
-    console.log(
-      '🚀 ~ file: upload.controller.ts:18 ~ UploadController ~ create ~ file:',
-      file,
-    );
-    console.log(
-      '🚀 ~ file: upload.controller.ts:10 ~ UploadController ~ create ~ body:',
-      body,
-    );
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log('file:', file);
+    return file;
+  }
 
-    return 'ok33';
+  //   單一欄位之多個檔案上傳
+  @Post('/multipleFile')
+  @UseInterceptors(FilesInterceptor('files'))
+  multipleFile(@UploadedFiles() files: Express.Multer.File[]) {
+    console.log('files:', files);
+    return files;
+  }
+
+  //   多欄位之多個檔案上傳
+  @Post('/multipleFileField')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'file1' }, { name: 'file2' }]),
+  )
+  multipleFileField(
+    @UploadedFiles() files: { [x: string]: Express.Multer.File[] },
+  ) {
+    console.log('files:', files);
+    return files;
+  }
+
+  //   不分欄位之多個檔案上傳
+  @Post('/anyMultipleField')
+  @UseInterceptors(AnyFilesInterceptor())
+  anyMultipleField(@UploadedFiles() files: Express.Multer.File[]) {
+    console.log('files:', files);
+    return files;
   }
 }

@@ -3,13 +3,11 @@ import { UploadService } from './upload.service';
 import { UploadController } from './upload.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-// import { join } from 'path';
 
 @Module({
   imports: [
     MulterModule.register({
       storage: diskStorage({
-        // destination: join(__dirname, '../images'),
         destination: './public/uploads/',
         filename: (req, file, cb) => {
           const randomName = Array(32)
