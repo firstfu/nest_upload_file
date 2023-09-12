@@ -20,6 +20,8 @@ import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 
+import { writeFile } from 'fs/promises';
+
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
@@ -27,10 +29,14 @@ export class UploadController {
   // 單一檔案上傳
   @Post('/singleFile')
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File, @Body() body) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     console.log('file:', file);
-    console.log(body.address);
-    return file;
+    console.log(file.buffer);
+    const rs = await writeFile(
+      `./public/uploads/${file.originalname}`,
+      file.buffer,
+    );
+    return rs;
   }
 
   //   單一欄位之多個檔案上傳
